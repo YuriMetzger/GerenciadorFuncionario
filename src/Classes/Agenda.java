@@ -152,6 +152,7 @@ public class Agenda {
             
         };
     }
+
     public void excluiItemAgenda(String ID) throws SQLException{
         try(PreparedStatement pst = conexao.getConexao().prepareStatement("UPDATE agenda SET ativo = 0 WHERE idAgenda ="+ID)){
             pst.executeUpdate();
