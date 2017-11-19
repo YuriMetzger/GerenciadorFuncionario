@@ -7,10 +7,13 @@ package trabalho;
 
 import Classes.Agenda;
 import Classes.Funcionario;
+import Classes.SimpleTableModel;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
 
 /**
  *
@@ -38,7 +41,7 @@ public class FormAgenda extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane7 = new javax.swing.JScrollPane();
-        jTable7 = new javax.swing.JTable();
+        jtAgenda = new javax.swing.JTable();
         agenda_excluir = new javax.swing.JButton();
         agenda_editar = new javax.swing.JButton();
         agenda_salvar = new javax.swing.JButton();
@@ -55,31 +58,54 @@ public class FormAgenda extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Agenda");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowActivated(java.awt.event.WindowEvent evt) {
+                formWindowActivated(evt);
+            }
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
+        });
 
-        jTable7.setModel(new javax.swing.table.DefaultTableModel(
+        jtAgenda.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
             },
             new String [] {
-                "Nome", "Título compromisso", "Prioridade", "Data ", "Hora"
+                "ID", "Nome", "Título", "Prioridade", "Data ", "Hora"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
 
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
             }
         });
-        jScrollPane7.setViewportView(jTable7);
+        jtAgenda.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jtAgendaMouseClicked(evt);
+            }
+        });
+        jScrollPane7.setViewportView(jtAgenda);
 
         agenda_excluir.setText("Excluir");
+        agenda_excluir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                agenda_excluirActionPerformed(evt);
+            }
+        });
 
         agenda_editar.setText("Limpar");
+        agenda_editar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                agenda_editarActionPerformed(evt);
+            }
+        });
 
         agenda_salvar.setText("Salvar");
         agenda_salvar.addActionListener(new java.awt.event.ActionListener() {
@@ -93,6 +119,12 @@ public class FormAgenda extends javax.swing.JFrame {
         agenda_data.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 agenda_dataActionPerformed(evt);
+            }
+        });
+
+        agenda_nome.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                agenda_nomeActionPerformed(evt);
             }
         });
 
@@ -204,25 +236,115 @@ public class FormAgenda extends javax.swing.JFrame {
                 idFuncionario = listaFuncionario.get(i).getCodigo();
             }
         }
-
-        agenda.setTitulo(titulo);
-        agenda.setPrioridade(prioridade);
-        agenda.setNomeFuncionario(funcionario);
-        agenda.setIdFuncionario(idFuncionario);
-        agenda.setData(data);
-        agenda.setHora(hora);
-
+            agenda.setTitulo(titulo);
+            agenda.setPrioridade(prioridade);
+            agenda.setNomeFuncionario(funcionario);
+            agenda.setIdFuncionario(idFuncionario);
+            agenda.setData(data);
+            agenda.setHora(hora);
+        if(jtAgenda.getSelectedRow() == -1){
+            try {
+                agenda.cadastrarAgenda();
+            } catch (SQLException ex) {
+                Logger.getLogger(CadFuncionario.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }else{
+            try {
+            Integer idx = jtAgenda.getSelectedRow();
+            String ID = (String) jtAgenda.getModel().getValueAt(idx,0);
+            agenda.atualizaAgenda(ID);
+            } catch (SQLException ex) {
+                Logger.getLogger(FormAgenda.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        atualizaTabelaAgenda();
+    }//GEN-LAST:event_agenda_salvarActionPerformed
+    public void atualizaTabelaAgenda(){
+        Agenda agenda = new Agenda();
+        
         try {
-            agenda.cadastrarAgenda();
+            listaAgenda = agenda.listarAgenda();
+            
+            jtAgenda = createJtableAgenda( listaAgenda );
+            jScrollPane7.setViewportView(jtAgenda);
+            
         } catch (SQLException ex) {
             Logger.getLogger(CadFuncionario.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-    }//GEN-LAST:event_agenda_salvarActionPerformed
-
+    }
+    
+    public JTable createJtableAgenda( ArrayList<Agenda> listaAgenda ){
+        ArrayList dados = new ArrayList();
+        String[] colunas = new String[] 
+        {"ID","Nome","Titulo", "Prioridade", "Data", "Hora"};
+         
+         for (Agenda d:listaAgenda){
+            dados.add(new String[]
+                {d.getIdAgenda(), d.getNomeFuncionario(), d.getTitulo(), d.getPrioridade(), d.getData(), d.getHora(),}
+            );
+         }
+         
+         SimpleTableModel modelo =
+                new SimpleTableModel(dados, colunas);
+         
+         JTable jtable = new JTable(modelo);
+         return jtable;
+    }
+    
+    public void comboFuncionario(){
+        Funcionario funcionario = new Funcionario();
+        Object[] items = null; 
+        
+        try {
+            listaFuncionario = funcionario.listarFuncionario();
+        } catch (SQLException ex) {
+            Logger.getLogger(CadFuncionario.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        for (int i = 0; i < listaFuncionario.size(); i++) {
+            agenda_nome.addItem( listaFuncionario.get(i).getNome() );
+        }
+    }
     private void agenda_dataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_agenda_dataActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_agenda_dataActionPerformed
+
+    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
+
+    }//GEN-LAST:event_formWindowActivated
+
+    private void agenda_nomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_agenda_nomeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_agenda_nomeActionPerformed
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        atualizaTabelaAgenda();
+        comboFuncionario();
+    }//GEN-LAST:event_formWindowOpened
+
+    private void jtAgendaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jtAgendaMouseClicked
+    }//GEN-LAST:event_jtAgendaMouseClicked
+
+    private void agenda_editarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_agenda_editarActionPerformed
+        agenda_nome.setSelectedIndex(0);
+        agenda_tituloCompromisso.setText("");
+        agenda_prioridade.setSelectedIndex(0);
+        agenda_data.setText("");
+        agenda_hora.setText("");
+        jtAgenda.clearSelection();
+    }//GEN-LAST:event_agenda_editarActionPerformed
+
+    private void agenda_excluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_agenda_excluirActionPerformed
+        Agenda agenda = new Agenda();
+        Integer idx = jtAgenda.getSelectedRow();
+        String ID = (String) jtAgenda.getModel().getValueAt(idx,0);
+        try { 
+            agenda.excluiItemAgenda(ID);
+        } catch (SQLException ex) {
+            Logger.getLogger(FormAgenda.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        atualizaTabelaAgenda();
+    }//GEN-LAST:event_agenda_excluirActionPerformed
 
     /**
      * @param args the command line arguments
@@ -274,6 +396,6 @@ public class FormAgenda extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel37;
     private javax.swing.JLabel jLabel38;
     private javax.swing.JScrollPane jScrollPane7;
-    private javax.swing.JTable jTable7;
+    private javax.swing.JTable jtAgenda;
     // End of variables declaration//GEN-END:variables
 }
