@@ -15,7 +15,7 @@ public Connection getConexao(){
   try {
       Class.forName(DRIVER);
       connection = 
-      DriverManager.getConnection(URL, "root", "1234");
+      DriverManager.getConnection(URL, "root", "");
       return connection;
   }catch(ClassNotFoundException e){
       JOptionPane.showMessageDialog(null, 

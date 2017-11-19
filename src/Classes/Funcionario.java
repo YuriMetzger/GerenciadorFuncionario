@@ -17,9 +17,9 @@ public class Funcionario {
     private String dataAdmissao;
     private String descricao;
     private String beneficios;
-    private String cargo;
+    private int cargo;
     private String email;
-    private String nacionalidade;
+    private String naturalidade;
     private final Conexao conexao = new Conexao();
 
     public String getEmail() {
@@ -30,15 +30,15 @@ public class Funcionario {
         this.email = email;
     }
 
-    public String getNacionalidade() {
-        return nacionalidade;
+    public String getNaturalidade() {
+        return naturalidade;
     }
 
-    public void setNacionalidade(String nacionalidade) {
-        this.nacionalidade = nacionalidade;
+    public void setNaturalidade(String naturalidade) {
+        this.naturalidade = naturalidade;
     }
 
-    public Funcionario(int codigo, String cpf, String rg, String nome, String situacao, String dataNasc, String dataAdmissao, String descricao, String beneficios, String cargo, String email, String nacionalidade) {
+    public Funcionario(int codigo, int aInt1, String cpf, String rg, String nome, String situacao, String dataNasc, String dataAdmissao, String descricao, int cargo, String email, String naturalidade) {
         this.codigo = codigo;
         this.cpf = cpf;
         this.rg = rg;
@@ -47,10 +47,9 @@ public class Funcionario {
         this.dataNasc = dataNasc;
         this.dataAdmissao = dataAdmissao;
         this.descricao = descricao;
-        this.beneficios = beneficios;
         this.cargo = cargo;
         this.email = email;
-        this.nacionalidade = nacionalidade;
+        this.naturalidade = naturalidade;
     }
 
     public Funcionario(){
@@ -129,11 +128,11 @@ public class Funcionario {
         this.beneficios = beneficios;
     }
 
-    public String getCargo() {
+    public int getCargo() {
         return cargo;
     }
 
-    public void setCargo(String cargo) {
+    public void setCargo(int cargo) {
         this.cargo = cargo;
     }
     
@@ -149,13 +148,11 @@ public class Funcionario {
             
             while(rs.next())
             {
-            //lista.add( new Funcionario( rs.getInt("idFuncionario") ,rs.getString("nome_funcionario") , rs.getString("cpf, ") ) );
+                lista.add( new Funcionario(rs.getInt("idFuncionario"), rs.getInt("codigo"), rs.getString("cpf"), rs.getString("rg"), rs.getString("nome_funcionario"), rs.getString("situacao"), rs.getString("dataNasc"), rs.getString("dataAdmissao"), rs.getString("descricao"), rs.getInt("cargo"), rs.getString("email"), rs.getString("naturalidade")));             
             }
         }
         conexao.close();
         
         return lista;
-    }
-
-  
+    }  
 }
