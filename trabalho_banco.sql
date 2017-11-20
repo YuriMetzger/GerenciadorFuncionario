@@ -36,7 +36,8 @@ CREATE TABLE `agenda` (
   `prioridade` varchar(10) NOT NULL,
   `data` varchar(15) DEFAULT NULL,
   `hora` varchar(6) DEFAULT NULL,
-  `idFuncionario` int(11) DEFAULT NULL
+  `idFuncionario` int(11) DEFAULT NULL,
+  `ativo`bool
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
